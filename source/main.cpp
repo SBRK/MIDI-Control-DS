@@ -38,11 +38,11 @@ void nextframe(){
 }
 
 void timerCallback(){
-	++Midi::msTicks;
-	if (Cfg::midiConnected == 2){
+	/*if (Cfg::midiConnected == 2){
 		display->pre_connect();
-	}
+	}*/
 	if (Cfg::midiConnected == 1){
+		++Midi::msTicks;
 		midi->update();
 	}
 }
@@ -56,18 +56,15 @@ int main(void){
 
 	save->loadCcs();
 
-	timerStart(1, ClockDivider_1024, TIMER_FREQ_1024(1000), timerCallback);
-	if (Cfg::wifi){
-		midi->connect();
-	} else {
-		Cfg::midiConnected = 1;
-	}
-	while (Cfg::midiConnected > 1);
+	midi->connect();
+	
 	if (Cfg::midiConnected == 0){
 		display->connection_error();
 		while(1)
 			nextframe();
 	} else {
+		timerStop(3);
+		timerStart(3, ClockDivider_1024, TIMER_FREQ_1024(1000), timerCallback);
 		display->connected();
 		while(1){
 			input->update();
